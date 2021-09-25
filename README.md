@@ -36,6 +36,5 @@ Input: a copy of synthetic datasets
 Output: a small dataset that most of it are real.
 
 
-=======
->>>>>>> 6b4f30db172dc35552d64de14f451bfac5df6259
+
 
