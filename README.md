@@ -10,6 +10,11 @@ Aoting  Hu,  Renjie  Xie,  Zhigang  Lu,  Aiqun  Hu,  and  Minhui  Xue.  2021.Tab
 
 ## Introduction
 
+Input: a copy of synthetic datasets
+
+Output: a small dataset that most of it are real.
+
+
 The basic implementation is shown in notebook TableGAN-MCA.ipynb.
 
 Tabular Datasets: Adult
@@ -23,12 +28,14 @@ We support the follwoing net:
 
 All nets are work with tabular data.
 
-## TableGAN-MCA 
 
 
+<<<<<<< HEAD
 Input: a copy of synthetic datasets
 
 Output: a small dataset that most of it are real.
 
 
+=======
+>>>>>>> 6b4f30db172dc35552d64de14f451bfac5df6259
 
