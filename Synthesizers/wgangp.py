@@ -48,13 +48,22 @@ class WGANGP():
         print("Begin training...")
         for i in range(self.epochs):
             for _, data in enumerate(loader):
+
+                self.myG.train()
+                myD.train()
+                    # Training D
+                    # for real data
+                    # Requires grad, Generator requires_grad = False
+                for p in myD.parameters():
+                    p.requires_grad = True
   
                 for _ in range(2):
+
 
                     real = data[0]
                     noise = torch.normal(mean = mean, std = std) #(500,128)
 
-                    fake = self.myG(noise)  
+                    fake = self.myG(noise).detach()
                     
                     fakeact = apply_activate(fake, self.data_info)   
 
@@ -67,6 +76,10 @@ class WGANGP():
                     optimD.zero_grad()
                     loss_d.backward() 
                     optimD.step()
+                
+                # Training G
+                for p in myD.parameters():
+                    p.requires_grad = False  # to avoid computation
                     
                 noise_2 = torch.normal(mean = mean, std = std)
                 fake_2 = self.myG(noise_2)
@@ -85,8 +98,9 @@ class WGANGP():
                      loss_d.item(), loss_g.item()))
 
 
-    
+    @torch.no_grad()
     def sample(self,n,seed=0):
+        self.myG.eval()
         print("Begin sample，seed=",seed)
         set_seed(seed)
         steps = n // self.batch_size +1

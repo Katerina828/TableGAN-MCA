@@ -60,54 +60,25 @@ def add_true_label(real,fake):
     fake_new['label'] = fake_new['label'].astype('int')
     return fake_new
 
-def label_func(real, syn, benchmark,n_bins=60):
-    discretizer = KBinsDiscretizer(n_bins=n_bins, encode='ordinal', strategy='uniform')
+def label_func(real, syn):
+
     enc = OrdinalEncoder()
-
-    if benchmark=="Adult":
-        colomns = ["WorkClass","MaritalStatus","Occupation","Relationship","Race","Gender","CapitalGain","CapitalLoss","NativeCountry","Income"]
-        real[colomns] = enc.fit_transform(real[colomns])
-        syn[colomns] = enc.transform(syn[colomns])
-
-        
-    if benchmark == "Lawschool":
-        colomns = ['race','college','year']
-
-        real[colomns] = enc.fit_transform(real[colomns])
-        real['gpa'] = discretizer.fit_transform(real.values[:,1:2])
-        syn['year'] = syn['year'].astype('object')
-        real[['resident','gender','admit']] = real[['resident','gender','admit']].astype('float')
-        syn[['resident','gender','admit']] = syn[['resident','gender','admit']].astype('float')
-        syn[colomns] = enc.transform(syn[colomns])
-        syn['gpa'] = discretizer.transform(syn.values[:,1:2])
-
-    if benchmark == "Compas":
-        real = real[syn.columns]
-        colomns = ["sex","race","juv_fel_count","c_charge_degree","v_score_text","two_year_recid"]
-        real[colomns] = enc.fit_transform(real[colomns])
-        real[['diff_custody','diff_jail']] = discretizer.fit_transform(real[['diff_custody','diff_jail']])
-        syn[colomns] = enc.transform(syn[colomns])
-        syn[['diff_custody','diff_jail']] = discretizer.transform(syn[['diff_custody','diff_jail']])
-
-
+    colomns = ["WorkClass","MaritalStatus","Occupation","Relationship","Race","Gender","CapitalGain","CapitalLoss","NativeCountry","Income"]
+    real[colomns] = enc.fit_transform(real[colomns])
+    syn[colomns] = enc.transform(syn[colomns])
     synlabeled = add_true_label(real,syn)
-    
     print("Number of positive synthetic data:",synlabeled.label.value_counts()[1])
     print("Positive percentage:",synlabeled.label.value_counts()[1]/len(synlabeled))
-
     return synlabeled
 
 
 
 
 
-def Tablegan_mca(real,syn,data_info,shadowmodel,epochs, benchmark,seed=0,n_bins=60):
-    if benchmark =='Adult' or benchmark =='Lawschool':
-        epochs=300
-        bs=500
-    else:
-        epochs=600
-        bs=100
+def Tablegan_mca(real,syn,data_info,shadowmodel,epochs,seed=0):
+    epochs=300
+    bs=500
+
     #train shadow model and sample shadow datasets
     synstate =syn.copy()
     
@@ -115,38 +86,13 @@ def Tablegan_mca(real,syn,data_info,shadowmodel,epochs, benchmark,seed=0,n_bins=
     data_info = get_data_info(syn,cat_vars)
     print("Synthetic datasets info:", data_info)
 
-    
-    ns= int(len(syn)/len(real))
-    if ns<1:
-        smodel1,tf = train_Gmodel(shadowmodel,syn,data_info,seed=seed+1,epochs=epochs,bs=bs)
-        shadow1 = sample_data_fromGAN(smodel1,tf,n=int(len(real)-len(syn)),benchmark=benchmark,seed=seed+1)
-        syn = pd.concat([syn,shadow1])
-        print("artifitial synthetic shape:", syn.shape)
-        smodel,tf = train_Gmodel(shadowmodel,syn,data_info,seed=seed,epochs=epochs,bs=bs)
-        shadow = sample_data_fromGAN(smodel,tf,n=len(syn),benchmark=benchmark,seed=seed)
-        labeled_shadow = label_func(synstate, shadow, benchmark,n_bins=n_bins)  #training data
-    elif ns==1:
-        smodel,tf = train_Gmodel(shadowmodel,syn,data_info,seed=seed,epochs=epochs,bs=bs)
-        shadow = sample_data_fromGAN(smodel,tf,n=len(syn),benchmark=benchmark,seed=seed)
-        labeled_shadow = label_func(synstate, shadow, benchmark,n_bins=n_bins)  #training data
-    
-    elif ns>1:
-        labeled_shadow = []
-        for i in range(ns):
-            print("%d th shadow GAN training" %(i))
-            syn_c = synstate.loc[i*len(real):(i+1)*len(real)]
-            data_info = get_data_info(syn_c,cat_vars)
-            smodeli,tf = train_Gmodel(shadowmodel,syn_c,data_info,seed=seed+1,epochs=epochs,bs=bs) #the i-th shadow model traind on synthetic copy i
-            shadowi = sample_data_fromGAN(smodeli,tf,n=int(len(synstate)),benchmark=benchmark,seed=seed+1) #the i-th shadow data
-            labeled_shadowi = label_func(syn_c, shadowi, benchmark,n_bins=n_bins)
-            print(labeled_shadowi.shape)
-            labeled_shadow.append(labeled_shadowi)  #training data
-        labeled_shadow = pd.concat(labeled_shadow, axis=0) 
-        print('total labeled shadow data:', labeled_shadow.shape)
 
+    smodel,tf = train_Gmodel(shadowmodel,syn,data_info,seed=seed,epochs=epochs,bs=bs)
+    shadow = sample_data_fromGAN(smodel,tf,n=len(syn),seed=seed)
+    labeled_shadow = label_func(synstate, shadow)  #training data
     
-    labeled_syn = label_func(real, syn, benchmark,n_bins=n_bins) #testing data
     
+    labeled_syn = label_func(real, syn) #testing data
     classifier= train_classifier(labeled_shadow) #train attack model 
     y_score = predict_prob(classifier,labeled_syn)
     labeled_syn['y_score']=y_score

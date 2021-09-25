@@ -29,27 +29,21 @@ def sample_data(n,generator,seed,data_info, bs=500):
     sampled_data = data[:n]  
     return sampled_data
 
-def sample_data_fromGAN(gan,tf,n,benchmark,seed):
+def sample_data_fromGAN(gan,tf,n,seed):
     sample = gan.sample(n = n,seed=seed)
     data_inverse = tf.inverse_transform(sample)
     syn = pd.DataFrame(data_inverse,index=None,columns = tf.columns_name)
-    if benchmark=='Adult':
-        syn = adult_postprocess(syn)
-    elif benchmark=='Lawschool':
-        syn = lawsch_postprocess(syn)
-    elif benchmark=='Compas':
-        syn = compas_postprocess(syn)
+
+    syn = adult_postprocess(syn)
+
     return syn
 
-def sample_data_fromGen(Gen,tf,n,data_info,benchmark,seed):
+
+def sample_data_fromGen(Gen,tf,n,data_info,seed):
     
     sample = sample_data(n,Gen,seed,data_info, bs=500)
     data_inverse = tf.inverse_transform(sample)
     syn = pd.DataFrame(data_inverse,index=None,columns = tf.columns_name)
-    if benchmark=='Adult':
-        syn = adult_postprocess(syn)
-    elif benchmark=='Lawschool':
-        syn = lawsch_postprocess(syn)
-    elif benchmark=='Compas':
-        syn = compas_postprocess(syn)
+    syn = adult_postprocess(syn)
+
     return syn

@@ -12,16 +12,14 @@ Aoting  Hu,  Renjie  Xie,  Zhigang  Lu,  Aiqun  Hu,  and  Minhui  Xue.  2021.Tab
 
 The basic implementation is shown in notebook TableGAN-MCA.ipynb.
 
-Tabular Datasets: Adult, Lawschool, Compas
+Tabular Datasets: Adult
 
 We support the follwoing net:
--   'vanilla VAE',
 -   'WGAN with gradient penalty',
 -   'WGAN with weight decay
 -   'Differentially private WGAN with weight decay'
 -   'CTGANSynthesizer', (Chen et al. 2019. “Modeling Tabular data using Conditional GAN”)
 -   'TVAESynthesizer', (Chen et al. 2019. “Modeling Tabular data using Conditional GAN”)
--   'Constrained WGANGP', (our proposed defense)
 
 All nets are work with tabular data.
 
@@ -32,5 +30,5 @@ Input: a copy of synthetic datasets
 
 Output: a small dataset that most of it are real.
 
-For example, TableGAN-MCA on input of 31655 Adult synthetic data, output 2435 synthetic data, 1948 are real. True positive rate: 0.80 
+
 
