@@ -29,8 +29,6 @@ We support the follwoing net:
 All nets are work with tabular data.
 
 
-
-<<<<<<< HEAD
 Input: a copy of synthetic datasets
 
 Output: a small dataset that most of it are real.
