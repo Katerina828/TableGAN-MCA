@@ -21,7 +21,7 @@ The basic implementation is shown in notebook TableGAN-MCA.ipynb.
 
 ### Generative Models and Data infomation
 
-Tabular Datasets: Adult
+Tabular Datasets: Adult, Lawdchool, Compas
 
 We attack the follwoing genrative models:
 -   'WGAN with gradient penalty',
