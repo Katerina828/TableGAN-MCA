@@ -10,6 +10,8 @@ Aoting  Hu,  Renjie  Xie,  Zhigang  Lu,  Aiqun  Hu,  and  Minhui  Xue.  2021.Tab
 
 ## Introduction
 
+### Attacks
+
 Input: a copy of synthetic datasets
 
 Output: a small dataset that most of it are real.
@@ -17,9 +19,11 @@ Output: a small dataset that most of it are real.
 
 The basic implementation is shown in notebook TableGAN-MCA.ipynb.
 
+### Generative Models and Data infomation
+
 Tabular Datasets: Adult
 
-We support the follwoing net:
+We attack the follwoing genrative models:
 -   'WGAN with gradient penalty',
 -   'WGAN with weight decay
 -   'Differentially private WGAN with weight decay'
